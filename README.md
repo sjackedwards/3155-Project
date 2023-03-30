@@ -104,3 +104,13 @@ This program will act as a platform for a user to scrape Expedia for flight info
 **Testing:** Verify functionality by making sure the output is legible and formatted correctly.  
 ### REQ-12
 TBD  
+
+
+# Constraints
+
+# Use Cases
+
+# User Stories
+
+# Glossary
+
