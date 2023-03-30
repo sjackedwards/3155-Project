@@ -4,6 +4,12 @@ Project 1 for ITSC-3155-002
 ### Note:
 I tried to reach out to my teammates via e-mail and will try again tomorrow in-class but I have not heard from them. Coming to class has become a huge problem with changes in work and home life. Please let me know if there are any alternatives. I do not mind attempting the project on my own.
 
+# Revisions
+
+|  Version  |  Date  |  Description  |  Author  |  Reviewed By  |
+
+| 1.0 | 03/22/23 | Initial draft | [Samuel Edwards](mailto:sedwar92@uncc.edu) | [Samuel Edwards](mailto:sedwar92@uncc.edu) |
+
 
 # **Introduction**
 This program will act as a platform for a user to scrape Expedia for flight information. It will utilize a GUI for ease of use in conjunction with a terminal prompt that will allow the user to sort and choose flights. It will use a SQL(or .csv) backend for storing the flight information that will be sorted and displayed. It will then be able to complete the booking process if the user has provided the correct credentials.
