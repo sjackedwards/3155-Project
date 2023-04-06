@@ -16,6 +16,3 @@ def cleanup_test_user():
     c.execute("DELETE FROM users WHERE username = 'testuser'")
     conn.commit()
     conn.close()
-
-if __name__ == '__main__':
-    setup_database()

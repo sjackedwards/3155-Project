@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 from authentication import register, login
+from core_gui import Core
 
 class Application(tk.Tk):
     def __init__(self):
@@ -51,10 +52,17 @@ class Application(tk.Tk):
             token = login(username, password)
             if token:
                 messagebox.showinfo("Login", "Login successful.")
+                self.create_core_window(username)
             else:
                 messagebox.showerror("Login", "Incorrect username or password.")
         else:
             messagebox.showerror("Login", "Both fields are required.")
+
+    def create_core_window(self, username):
+        core_window = Core()
+        #self.withdraw()
+        core_window.mainloop()
+
 
 def main():
     app = Application()
