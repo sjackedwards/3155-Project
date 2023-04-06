@@ -1,3 +1,4 @@
 pylint==2.17.1o
 plantuml==0.3.0
 Flask==2.2.3
+tkcalendar==1.6.1
