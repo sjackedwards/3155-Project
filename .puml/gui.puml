@@ -1,0 +1,231 @@
+@startuml classes
+set namespaceSeparator none
+class "Application" as gui.Application #aliceblue {
+  btn_login : Button
+  btn_register : Button
+  ent_password : Entry
+  ent_username : Entry
+  lbl_password : Label
+  lbl_username : Label
+  create_widgets()
+  login_user()
+  register_user()
+}
+class "Misc" as tkinter.Misc #grey {
+  anchor
+  bbox
+  columnconfigure
+  config
+  focus
+  lift
+  propagate
+  register
+  rowconfigure
+  size
+  slaves
+  waitvar
+  after(ms, func)
+  after_cancel(id)
+  after_idle(func)
+  bell(displayof)
+  bind(sequence, func, add)
+  bind_all(sequence, func, add)
+  bind_class(className, sequence, func, add)
+  bindtags(tagList)
+  cget(key)
+  clipboard_append(string)
+  clipboard_clear()
+  clipboard_get()
+  configure(cnf)
+  deletecommand(name)
+  destroy()
+  event_add(virtual)
+  event_delete(virtual)
+  event_generate(sequence)
+  event_info(virtual)
+  focus_displayof()
+  focus_force()
+  focus_get()
+  focus_lastfor()
+  focus_set()
+  getboolean(s)
+  getdouble(s)
+  getint(s)
+  getvar(name)
+  grab_current()
+  grab_release()
+  grab_set()
+  grab_set_global()
+  grab_status()
+  grid_anchor(anchor)
+  grid_bbox(column, row, col2, row2)
+  grid_columnconfigure(index, cnf)
+  grid_location(x, y)
+  grid_propagate(flag)
+  grid_rowconfigure(index, cnf)
+  grid_size()
+  grid_slaves(row, column)
+  image_names()
+  image_types()
+  keys()
+  lower(belowThis)
+  mainloop(n)
+  nametowidget(name)
+  option_add(pattern, value, priority)
+  option_clear()
+  option_get(name, className)
+  option_readfile(fileName, priority)
+  pack_propagate(flag)
+  pack_slaves()
+  place_slaves()
+  quit()
+  selection_clear()
+  selection_get()
+  selection_handle(command)
+  selection_own()
+  selection_own_get()
+  send(interp, cmd)
+  setvar(name, value)
+  tk_bisque()
+  tk_focusFollowsMouse()
+  tk_focusNext()
+  tk_focusPrev()
+  tk_setPalette()
+  tk_strictMotif(boolean)
+  tkraise(aboveThis)
+  unbind(sequence, funcid)
+  unbind_all(sequence)
+  unbind_class(className, sequence)
+  update()
+  update_idletasks()
+  wait_variable(name)
+  wait_visibility(window)
+  wait_window(window)
+  winfo_atom(name, displayof)
+  winfo_atomname(id, displayof)
+  winfo_cells()
+  winfo_children()
+  winfo_class()
+  winfo_colormapfull()
+  winfo_containing(rootX, rootY, displayof)
+  winfo_depth()
+  winfo_exists()
+  winfo_fpixels(number)
+  winfo_geometry()
+  winfo_height()
+  winfo_id()
+  winfo_interps(displayof)
+  winfo_ismapped()
+  winfo_manager()
+  winfo_name()
+  winfo_parent()
+  winfo_pathname(id, displayof)
+  winfo_pixels(number)
+  winfo_pointerx()
+  winfo_pointerxy()
+  winfo_pointery()
+  winfo_reqheight()
+  winfo_reqwidth()
+  winfo_rgb(color)
+  winfo_rootx()
+  winfo_rooty()
+  winfo_screen()
+  winfo_screencells()
+  winfo_screendepth()
+  winfo_screenheight()
+  winfo_screenmmheight()
+  winfo_screenmmwidth()
+  winfo_screenvisual()
+  winfo_screenwidth()
+  winfo_server()
+  winfo_toplevel()
+  winfo_viewable()
+  winfo_visual()
+  winfo_visualid()
+  winfo_visualsavailable(includeids)
+  winfo_vrootheight()
+  winfo_vrootwidth()
+  winfo_vrootx()
+  winfo_vrooty()
+  winfo_width()
+  winfo_x()
+  winfo_y()
+}
+class "Tk" as tkinter.Tk #grey {
+  children : dict
+  master : NoneType
+  test : Button
+  tk : NoneType
+  destroy()
+  loadtk()
+  readprofile(baseName, className)
+  report_callback_exception(exc, val, tb)
+}
+class "Wm" as tkinter.Wm #grey {
+  aspect
+  attributes
+  client
+  colormapwindows
+  command
+  deiconify
+  focusmodel
+  forget
+  frame
+  geometry
+  grid
+  group
+  iconbitmap
+  iconify
+  iconmask
+  iconname
+  iconphoto
+  iconposition
+  iconwindow
+  manage
+  maxsize
+  minsize
+  overrideredirect
+  positionfrom
+  protocol
+  resizable
+  sizefrom
+  state
+  title
+  transient
+  withdraw
+  wm_aspect(minNumer, minDenom, maxNumer, maxDenom)
+  wm_attributes()
+  wm_client(name)
+  wm_colormapwindows()
+  wm_command(value)
+  wm_deiconify()
+  wm_focusmodel(model)
+  wm_forget(window)
+  wm_frame()
+  wm_geometry(newGeometry)
+  wm_grid(baseWidth, baseHeight, widthInc, heightInc)
+  wm_group(pathName)
+  wm_iconbitmap(bitmap, default)
+  wm_iconify()
+  wm_iconmask(bitmap)
+  wm_iconname(newName)
+  wm_iconphoto(default)
+  wm_iconposition(x, y)
+  wm_iconwindow(pathName)
+  wm_manage(widget)
+  wm_maxsize(width, height)
+  wm_minsize(width, height)
+  wm_overrideredirect(boolean)
+  wm_positionfrom(who)
+  wm_protocol(name, func)
+  wm_resizable(width, height)
+  wm_sizefrom(who)
+  wm_state(newstate)
+  wm_title(string)
+  wm_transient(master)
+  wm_withdraw()
+}
+gui.Application --|> tkinter.Tk
+tkinter.Tk --|> tkinter.Misc
+tkinter.Tk --|> tkinter.Wm
+@enduml
