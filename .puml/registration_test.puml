@@ -1,0 +1,82 @@
+@startuml classes
+set namespaceSeparator none
+class "TestAuth" as registration_test.TestAuth #aliceblue {
+  setUpClass()
+  tearDownClass()
+  test_check_password_requirements()
+  test_register_login()
+}
+class "TestCase" as unittest.case.TestCase #grey {
+  assertAlmostEquals
+  assertEquals
+  assertNotAlmostEquals
+  assertNotEquals
+  assertNotRegexpMatches
+  assertRaisesRegexp
+  assertRegexpMatches
+  assert_
+  failIf
+  failIfAlmostEqual
+  failIfEqual
+  failUnless
+  failUnlessAlmostEqual
+  failUnlessEqual
+  failUnlessRaises
+  failureException : AssertionError
+  longMessage : bool
+  maxDiff : int
+  addClassCleanup()
+  addCleanup()
+  addTypeEqualityFunc(typeobj, function)
+  assertAlmostEqual(first, second, places, msg, delta)
+  assertCountEqual(first, second, msg)
+  assertDictContainsSubset(subset, dictionary, msg)
+  assertDictEqual(d1, d2, msg)
+  assertEqual(first, second, msg)
+  assertFalse(expr, msg)
+  assertGreater(a, b, msg)
+  assertGreaterEqual(a, b, msg)
+  assertIn(member, container, msg)
+  assertIs(expr1, expr2, msg)
+  assertIsInstance(obj, cls, msg)
+  assertIsNone(obj, msg)
+  assertIsNot(expr1, expr2, msg)
+  assertIsNotNone(obj, msg)
+  assertLess(a, b, msg)
+  assertLessEqual(a, b, msg)
+  assertListEqual(list1, list2, msg)
+  assertLogs(logger, level)
+  assertMultiLineEqual(first, second, msg)
+  assertNoLogs(logger, level)
+  assertNotAlmostEqual(first, second, places, msg, delta)
+  assertNotEqual(first, second, msg)
+  assertNotIn(member, container, msg)
+  assertNotIsInstance(obj, cls, msg)
+  assertNotRegex(text, unexpected_regex, msg)
+  assertRaises(expected_exception)
+  assertRaisesRegex(expected_exception, expected_regex)
+  assertRegex(text, expected_regex, msg)
+  assertSequenceEqual(seq1, seq2, msg, seq_type)
+  assertSetEqual(set1, set2, msg)
+  assertTrue(expr, msg)
+  assertTupleEqual(tuple1, tuple2, msg)
+  assertWarns(expected_warning)
+  assertWarnsRegex(expected_warning, expected_regex)
+  countTestCases()
+  debug()
+  defaultTestResult()
+  doClassCleanups()
+  doCleanups()
+  fail(msg)
+  id()
+  run(result)
+  {abstract}setUp()
+  {abstract}setUpClass()
+  shortDescription()
+  skipTest(reason)
+  subTest(msg)
+  {abstract}tearDown()
+  {abstract}tearDownClass()
+}
+registration_test.TestAuth --|> unittest.case.TestCase
+@enduml
