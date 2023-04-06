@@ -35,12 +35,13 @@ class Application(tk.Tk):
         password = self.ent_password.get()
 
         if username and password:
-            if register(username, password):
-                messagebox.showinfo("Registration", "User registered successfully.")
-            else:
-                messagebox.showerror("Registration", "Username already exists.")
+            success, message = register(username, password)
+        if success:
+            messagebox.showinfo("Registration", message)
         else:
-            messagebox.showerror("Registration", "Both fields are required.")
+            messagebox.showerror("Registration", message)
+
+                
 
     def login_user(self):
         username = self.ent_username.get()

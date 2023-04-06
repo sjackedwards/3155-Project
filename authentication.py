@@ -19,11 +19,11 @@ def check_password_requirements(password):
     return True
 
 
-# Credit to my co-worker Phil for help with this database!!
+
 
 def register(username, password):
     if not check_password_requirements(password):
-        return False
+        return False, "Password does not meet the requirements."
 
     conn = sqlite3.connect("local_app.db")
     cursor = conn.cursor()
@@ -32,7 +32,7 @@ def register(username, password):
     if cursor.fetchone() is not None:
         cursor.close()
         conn.close()
-        return False
+        return False, "Username already exists."
 
     hashed_password = hash_password(password)
     cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, hashed_password))
@@ -40,7 +40,7 @@ def register(username, password):
 
     cursor.close()
     conn.close()
-    return True
+    return True, "User registered successfully."
 
 
 def login(username, password):
