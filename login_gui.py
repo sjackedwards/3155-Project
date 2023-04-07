@@ -89,13 +89,13 @@ class LoginGui(tk.Tk):
     def create_core_window(self, username, api_key):
         self.username = username
         self.api_key = api_key
-        core_window = Core(self, username=username)
+        core_window = Core(self, username=username, api_key=api_key)
         self.withdraw()
         core_window.protocol("WM_DELETE_WINDOW", self.destroy_core_window)
         core_window.mainloop()
 
     def destroy_core_window(self):
-        self.deiconify()
+        self.destroy()
 
 
 
