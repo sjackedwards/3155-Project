@@ -52,6 +52,7 @@ class Login(tk.Tk):
             token = login(username, password)
             if token:
                 messagebox.showinfo("Login", "Login successful.")
+                
                 self.create_core_window(username)
                 
             else:
