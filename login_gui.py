@@ -80,6 +80,7 @@ class LoginGui(tk.Tk):
                 messagebox.showinfo("Login", "Login successful.")
                 self.api_key = api_key
                 self.create_core_window(username, api_key)
+
             else:
                 messagebox.showerror("Login", "Incorrect username or password.")
         else:
@@ -87,8 +88,15 @@ class LoginGui(tk.Tk):
 
     def create_core_window(self, username, api_key):
         self.username = username
-        core_window = Core(username=username, api_key=api_key)
+        self.api_key = api_key
+        core_window = Core(self, username=username)
+        self.withdraw()
+        core_window.protocol("WM_DELETE_WINDOW", self.destroy_core_window)
         core_window.mainloop()
+
+    def destroy_core_window(self):
+        self.deiconify()
+
 
 
 def main():
