@@ -21,48 +21,49 @@ def check_password_requirements(password):
 
 
 
-def register(username, password):
-    if not check_password_requirements(password):
-        return False, "Password does not meet the requirements."
-
-    conn = sqlite3.connect("local_app.db")
-    cursor = conn.cursor()
-
-    cursor.execute("SELECT * FROM users WHERE username=?", (username,))
-    if cursor.fetchone() is not None:
-        cursor.close()
-        conn.close()
-        return False, "Username already exists."
-
+def register(username, password, api_key):
     hashed_password = hash_password(password)
-    cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, hashed_password))
-    conn.commit()
 
-    cursor.close()
-    conn.close()
-    return True, "User registered successfully."
+    db_conn = sqlite3.connect("local_app.db")
+    cursor = db_conn.cursor()
+
+    try:
+        cursor.execute("INSERT INTO users (username, password, api_key) VALUES (?, ?, ?)", (username, hashed_password, api_key))
+        db_conn.commit()
+        success = True
+        message = "User successfully registered."
+    except sqlite3.IntegrityError:
+        success = False
+        message = "Username already exists."
+    finally:
+        cursor.close()
+        db_conn.close()
+
+    return success, message
+
 
 
 def login(username, password):
     db_conn = sqlite3.connect("local_app.db")
     cursor = db_conn.cursor()
 
-    cursor.execute("SELECT password FROM users WHERE username=?", (username,))
-    db_pass = cursor.fetchone()
+    cursor.execute("SELECT password, api_key FROM users WHERE username=?", (username,))
+    result = cursor.fetchone()
     cursor.close()
     db_conn.close()
 
-    if db_pass is None:
-        return None
+    if result is None:
+        return None, None
 
     # Checks the hashed password in the database against user input.
-    stored_password = db_pass[0]
+    stored_password, api_key = result
     hashed_password = hash_password(password)
 
     if stored_password == hashed_password:
-        return username
+        return username, api_key
     else:
-        return None
+        return None, None
+
 
 
 ###   TODO: I want to implement some type of error reporting. If the user puts in an empty password,

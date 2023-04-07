@@ -1,17 +1,20 @@
 import tkinter as tk
+import os
 from tkcalendar import DateEntry
+from api_call import make_api_call
 
 class Core(tk.Toplevel):
-    def __init__(self, master=None, username=None):
+    def __init__(self, master=None, username=None, api_key=None):
         super().__init__(master)
 
         self.title("Flight Searcher")
         self.geometry("800x600")
-        #self.protocol("WM_DELETE_WINDOW", self.on_close)
 
         self.username = username
+        self.api_key = api_key
 
         self.create_widgets()
+
 
     def create_widgets(self):
         self.lbl_username = tk.Label(self, text=f"Welcome, {self.username}")
@@ -58,39 +61,21 @@ class Core(tk.Toplevel):
         self.exit_button = tk.Button(self, text="Exit", command=self.close_app)
         self.exit_button.grid(row=8, column=1, padx=5, pady=5)
 
+        self.lbl_api_key = tk.Label(self, text=f"API KEY loaded:  {self.api_key}")
+        self.lbl_api_key.grid(row=9, column=1, padx=5, pady=5)
+
+    def close_app(self):
+        self.destroy()
 
     def submit(self):
-        command = self.entry_var.get()
-        if command:
-            self.proof_of_command(command)
+        departure_date = self.start_date.get_date().strftime('%Y-%m-%d')
+        departing_airport = self.departing_airport_var.get()
+        arriving_airport = self.arriving_airport_var.get()
 
-    def proof_of_command(self, command):
-        tokens = command.split()
-
-        if len(tokens) < 3:
-            self.console.insert(tk.END, "Invalid command format. Please use 'add num1 num2' or 'subtract num1 num2'\n")
-            return
-
-        operation, num1, num2 = tokens[0], tokens[1], tokens[2]
+        api_key = os.environ['API Key']
 
         try:
-            num1, num2 = float(num1), float(num2)
-        except ValueError:
-            self.console.insert(tk.END, "Invalid numbers provided. Please use valid numbers.\n")
-            return
-
-        if operation.lower() == "add":
-            self.add(num1, num2)
-        elif operation.lower() == "subtract":
-            self.subtract(num1, num2)
-        else:
-            self.console.insert(tk.END, f"Invalid operation '{operation}'. Please use 'add' or 'subtract'.\n")
-
-    def add(self, num1, num2):
-        result = num1 + num2
-        self.console.insert(tk.END, f"Result: {result}\n")
-
-    def subtract(self, num1, num2):
-        result = num1 - num2
-        self.console.insert(tk.END, f"Result: {result}\n")
-
+            result = make_api_call(departure_date, departing_airport, arriving_airport, api_key)
+            self.console.insert(tk.END, f"API call result: {result}\n")
+        except Exception as e:
+            self.console.insert(tk.END, f"Error: {e}\n")
