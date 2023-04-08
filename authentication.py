@@ -2,6 +2,9 @@ import sqlite3
 import hashlib
 import re
 
+
+# TODO 1: Lets also hash the API key? Unhash on successful login.
+
 def hash_password(password):
     return hashlib.sha256(password.encode('utf-8')).hexdigest()
 

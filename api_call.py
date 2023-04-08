@@ -1,6 +1,13 @@
 import requests
 
-def get_flight_destinations(api_key, origin, destination, departure_date, return_date, adults, currency="USD", country_code="US", market="en-US"):
+# TODO 1: Lets implements # of people flying in adults parameter.
+
+def get_flight_destinations(api_key, origin, destination, departure_date, return_date, adults):
+    
+    currency="USD"
+    country_code="US" 
+    market="en-US"
+    
     url = "https://skyscanner50.p.rapidapi.com/api/v1/searchFlights"
 
     querystring = {

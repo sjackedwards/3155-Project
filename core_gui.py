@@ -13,6 +13,10 @@ class Core(tk.Toplevel):
 
         self.create_widgets()
 
+
+    # TODO 1: Clean literally everything up. Lets make a second listbox for return flights instead of lumping them all into one.
+    # TODO 2: I dont think I would like to book a flight that is leaving 45 mins after mine lands, lets implement a sort by time button.
+    # TODO 3: Change some button names, think of some new buttons we can add, maybe sort buttons. Need to look into tkinter capabilities. 
     def create_widgets(self):
         self.lbl_username = tk.Label(self, text=f"Welcome, {self.username}")
         self.lbl_username.grid(row=0, column=0, padx=5, pady=5)
@@ -64,10 +68,11 @@ class Core(tk.Toplevel):
         self.lbl_api_key = tk.Label(self, text=f"API KEY loaded:  {self.api_key}")
         self.lbl_api_key.grid(row=9, column=1, padx=5, pady=5)
 
-        
     def close_app(self):
         quit()
 
+    # TODO : Lets add a dropdown for # of people flying to pass to the api call.
+    
     def submit(self):
         departure_date = self.start_date.get_date().strftime('%Y-%m-%d')
         return_date = self.end_date.get_date().strftime('%Y-%m-%d')
@@ -82,10 +87,13 @@ class Core(tk.Toplevel):
         except Exception as e:
             self.flight_listbox.insert(tk.END, f"Error: {e}\n")
 
+    # TODO 1: I want the list box to clear after every search.
+    # TODO 2: Maybe attempt storing in a database again for better sorting functionality.
+    # TODO 3: Sort buttons???
+    # TODO 4: This looks like crap, but I dont think a method would make it any better. Maybe split this if we make a return flight list box.
     def update_flight_listbox(self, flight_data, carrier):
         flights = flight_data['data']
         for index, flight in enumerate(flights):
-            # flight_id = flight['id'][-6:]
             departure_time = flight['legs'][0]['departure'][12:18]
             origin = flight['legs'][0]['origin']['alt_id']
             destination = flight['legs'][0]['destination']['alt_id']
@@ -97,9 +105,7 @@ class Core(tk.Toplevel):
             ret_origin = flight['legs'][1]['origin']['alt_id']
             ret_destination = flight['legs'][1]['destination']['alt_id']
             ret_price = flight['price']['amount']
-            ret_airline = flight['legs'][1]['carriers'][0]['name']
-            #ret_stops = flight['legs'][0]['stop_count']
-            
+            ret_airline = flight['legs'][1]['carriers'][0]['name']            
             
             if stops == 0:
                 if carrier == airline:
