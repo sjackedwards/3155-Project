@@ -1,3 +1,4 @@
+import sqlite3
 import tkinter as tk
 import os
 from tkcalendar import DateEntry
@@ -72,7 +73,11 @@ class Core(tk.Toplevel):
         departing_airport = self.departing_airport_var.get()
         arriving_airport = self.arriving_airport_var.get()
 
-        api_key = os.environ['API Key']
+        db_conn = sqlite3.connect("local_app.db")
+        cursor = db_conn.cursor()
+        cursor.execute("SELECT api_key FROM users WHERE username = ?", (self.username,))
+        api_key = cursor.fetchone()[0]
+        db_conn.close()
 
         try:
             result = make_api_call(departure_date, departing_airport, arriving_airport, api_key)
