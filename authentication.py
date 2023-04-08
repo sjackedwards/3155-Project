@@ -6,9 +6,6 @@ def hash_password(password):
     return hashlib.sha256(password.encode('utf-8')).hexdigest()
 
 
-# Password requirements
-# TODO: Make this work better with registration. e.g. say what failed in the password registration.
-
 def check_password_requirements(password):
     if len(password) < 8:
         return False
@@ -55,7 +52,6 @@ def login(username, password):
     if result is None:
         return None, None
 
-    # Checks the hashed password in the database against user input.
     stored_password, api_key = result
     hashed_password = hash_password(password)
 
@@ -64,10 +60,3 @@ def login(username, password):
     else:
         return None, None
 
-
-
-###   TODO: I want to implement some type of error reporting. If the user puts in an empty password,
-###           the dialog box says 'empty password'. Commit comment
-
-
-    

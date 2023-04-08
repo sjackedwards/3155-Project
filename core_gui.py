@@ -1,29 +1,25 @@
-import sqlite3
 import tkinter as tk
-import os
 from tkcalendar import DateEntry
-from api_call import make_api_call
+from api_call import get_flight_destinations
 
 class Core(tk.Toplevel):
     def __init__(self, master=None, username=None, api_key=None):
         super().__init__(master)
 
         self.title("Flight Searcher")
-        self.geometry("800x600")
-
+        self.geometry("1100x600")
         self.username = username
         self.api_key = api_key
 
         self.create_widgets()
-
 
     def create_widgets(self):
         self.lbl_username = tk.Label(self, text=f"Welcome, {self.username}")
         self.lbl_username.grid(row=0, column=0, padx=5, pady=5)
 
         self.carrier_var = tk.StringVar(self)
-        self.carrier_var.set("Please Choose")
-        self.carrier_menu = tk.OptionMenu(self, self.carrier_var, "Please Choose", "Southwest", "United Airlines", "American Airlines", "SPIRIT")
+        self.carrier_var.set("Any Airline")
+        self.carrier_menu = tk.OptionMenu(self, self.carrier_var, "Any Airline", "Southwest", "Delta", "United Airlines", "jetBlue", "American Airlines", "SPIRIT")
         self.carrier_menu.config(width=20)
         self.carrier_menu.grid(row=1, column=0, padx=5, pady=5)
 
@@ -49,12 +45,15 @@ class Core(tk.Toplevel):
         self.entry_arriving_airport = tk.Entry(self, textvariable=self.arriving_airport_var)
         self.entry_arriving_airport.grid(row=3, column=3)
 
-        self.console = tk.Text(self, wrap=tk.WORD, height=15, width=60)
-        self.console.grid(row=6, column=0, columnspan=2, padx=5, pady=5)
+        self.flight_listbox = tk.Listbox(self, height=20)
+        self.flight_listbox.config(width=80)
+        self.flight_listbox.grid(row=6, column=0, pady=5)
 
-        self.entry_var = tk.StringVar()
-        self.entry = tk.Entry(self, textvariable=self.entry_var)
-        self.entry.grid(row=7, column=0, columnspan=2, padx=5, pady=5)
+        self.scrollbar = tk.Scrollbar(self, command=self.flight_listbox.yview)
+        self.scrollbar.grid(row=6, column=2, sticky='ns')
+        self.flight_listbox.config(yscrollcommand=self.scrollbar.set)
+
+
 
         self.submit_button = tk.Button(self, text="Submit", command=self.submit)
         self.submit_button.grid(row=8, column=0, padx=5, pady=5)
@@ -65,22 +64,73 @@ class Core(tk.Toplevel):
         self.lbl_api_key = tk.Label(self, text=f"API KEY loaded:  {self.api_key}")
         self.lbl_api_key.grid(row=9, column=1, padx=5, pady=5)
 
+        
     def close_app(self):
-        self.destroy()
+        quit()
 
     def submit(self):
         departure_date = self.start_date.get_date().strftime('%Y-%m-%d')
+        return_date = self.end_date.get_date().strftime('%Y-%m-%d')
         departing_airport = self.departing_airport_var.get()
         arriving_airport = self.arriving_airport_var.get()
-
-        db_conn = sqlite3.connect("local_app.db")
-        cursor = db_conn.cursor()
-        cursor.execute("SELECT api_key FROM users WHERE username = ?", (self.username,))
-        api_key = cursor.fetchone()[0]
-        db_conn.close()
+        carrier = self.carrier_var.get()
 
         try:
-            result = make_api_call(departure_date, departing_airport, arriving_airport, api_key)
-            self.console.insert(tk.END, f"API call result: {result}\n")
+            result = get_flight_destinations(self.api_key, departing_airport, arriving_airport, departure_date, return_date, adults="1")
+            self.update_flight_listbox(result, carrier)
+
         except Exception as e:
-            self.console.insert(tk.END, f"Error: {e}\n")
+            self.flight_listbox.insert(tk.END, f"Error: {e}\n")
+
+    def update_flight_listbox(self, flight_data, carrier):
+        flights = flight_data['data']
+        for index, flight in enumerate(flights):
+            # flight_id = flight['id'][-6:]
+            departure_time = flight['legs'][0]['departure'][12:18]
+            origin = flight['legs'][0]['origin']['alt_id']
+            destination = flight['legs'][0]['destination']['alt_id']
+            price = flight['price']['amount']
+            airline = flight['legs'][0]['carriers'][0]['name']
+            stops = flight['legs'][0]['stop_count']
+
+            ret_departure_time = flight['legs'][1]['departure'][12:18]
+            ret_origin = flight['legs'][1]['origin']['alt_id']
+            ret_destination = flight['legs'][1]['destination']['alt_id']
+            ret_price = flight['price']['amount']
+            ret_airline = flight['legs'][1]['carriers'][0]['name']
+            #ret_stops = flight['legs'][0]['stop_count']
+            
+            
+            if stops == 0:
+                if carrier == airline:
+                    self.flight_listbox.insert(tk.END, f"Flight {index+1} departure from {origin} to {destination} at {departure_time} with {airline} for ${price}. Non-stop.")
+                    self.flight_listbox.insert(tk.END, f"----Return from {ret_origin} to {ret_destination} at {ret_departure_time} with {ret_airline} for ${ret_price}.")
+                    self.flight_listbox.insert(tk.END, f"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+                else:
+                    if carrier == 'Any Airline':
+                        self.flight_listbox.insert(tk.END, f"Flight {index+1} departure from {origin} to {destination} at {departure_time} with {airline} for ${price}. Non-stop.")
+                        self.flight_listbox.insert(tk.END, f"----Return from {ret_origin} to {ret_destination} at {ret_departure_time} with {ret_airline} for ${ret_price}.")
+                        self.flight_listbox.insert(tk.END, f"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+            if stops == 1:
+                stoploc = flight['legs'][0]['stops'][0]['alt_id']
+                if carrier == airline:
+                    self.flight_listbox.insert(tk.END, f"Flight {index+1} from {origin} to {destination} at {departure_time} with {airline} for ${price}. It has 1 stop in: {stoploc}")
+                    self.flight_listbox.insert(tk.END, f"----Return from {ret_origin} to {ret_destination} at {ret_departure_time} with {ret_airline} for ${ret_price}.")
+                    self.flight_listbox.insert(tk.END, f"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+                else:
+                    if carrier == 'Any Airline':
+                        self.flight_listbox.insert(tk.END, f"Flight {index+1} from {origin} to {destination} at {departure_time} with {airline} for ${price}. It has 1 stop in: {stoploc}")
+                        self.flight_listbox.insert(tk.END, f"----Return from {ret_origin} to {ret_destination} at {ret_departure_time} with {ret_airline} for ${ret_price}.")
+                        self.flight_listbox.insert(tk.END, f"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+            else:
+                if carrier == airline:
+                    self.flight_listbox.insert(tk.END, f"Flight {index+1} from {origin} to {destination} at {departure_time} with {airline} for ${price}. It has multiple stops.")
+                    self.flight_listbox.insert(tk.END, f"----Return from {ret_origin} to {ret_destination} at {ret_departure_time} with {ret_airline} for ${ret_price}.")
+                    self.flight_listbox.insert(tk.END, f"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+                else:
+                    if carrier == 'Any Airline':
+                        self.flight_listbox.insert(tk.END, f"Flight {index+1} from {origin} to {destination} at {departure_time} with {airline} for ${price}. It has multiple stops.")
+                        self.flight_listbox.insert(tk.END, f"----Return from {ret_origin} to {ret_destination} at {ret_departure_time} with {ret_airline} for ${ret_price}.")
+                        self.flight_listbox.insert(tk.END, f"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+
+

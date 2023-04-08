@@ -8,7 +8,6 @@ def setup_database():
     conn.commit()
     conn.close()
 
-# For the registration_test to run multiple times.
 def cleanup_test_user():
     conn = sqlite3.connect('local_app.db')
     c = conn.cursor()

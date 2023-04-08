@@ -1,26 +1,23 @@
 import requests
 
-def make_api_call(departure_date, origin_place, destination_place, api_key):
-    url = "https://skyscanner44.p.rapidapi.com/fly-to-country"
+def get_flight_destinations(api_key, origin, destination, departure_date, return_date, adults, currency="USD", country_code="US", market="en-US"):
+    url = "https://skyscanner50.p.rapidapi.com/api/v1/searchFlights"
 
     querystring = {
-        "destination": destination_place,
-        "origin": origin_place,
-        "departureDate": departure_date,
-        "currency": "USD",
-        "locale": "en-US",
-        "country": "US"
+        "origin": origin,
+        "destination": destination,
+        "date": departure_date,
+        "returnDate": return_date,
+        "adults": adults,
+        "currency": currency,
+        "countryCode": country_code,
+        "market": market
     }
 
     headers = {
         "X-RapidAPI-Key": api_key,
-        "X-RapidAPI-Host": "skyscanner44.p.rapidapi.com"
+        "X-RapidAPI-Host": "skyscanner50.p.rapidapi.com"
     }
 
     response = requests.get(url, headers=headers, params=querystring)
-
-    if response.status_code == 200:
-        return response.json()
-    else:
-        raise Exception(f"API call failed with status code {response.status_code}")
-
+    return response.json()
