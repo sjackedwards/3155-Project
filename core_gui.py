@@ -4,6 +4,7 @@ from tkcalendar import DateEntry
 from api_call import get_flight_destinations
 import json
 from ttkthemes import ThemedStyle
+from api_call import search_airport
 
 def load_demo_result(file_name):
     with open(file_name, "r") as file:
@@ -11,30 +12,31 @@ def load_demo_result(file_name):
 demo = False
 
 
-button_bg = "#D9DDDC"
+
 
 class Core(tk.Toplevel):
     def __init__(self, master=None, username=None, api_key=None):
         super().__init__(master)
 
-        
-
         self.title("Flight Search")
-        self.geometry("835x550")
+        self.geometry("760x550")
         
-        self.configure(relief="groove", background="#D9DDDC")
+        self.configure(relief='groove', background="#D9DDDC")
         self.username = username
         self.api_key = api_key
 
         self.create_widgets()
 
+    def lookup_airport_code(self):
+        airport_code = search_airport(self.entered_city.get())
+        self.lbl_airport_code["text"] = f"Airport Code: {airport_code}"
 
 
     def create_widgets(self):
-        lbl_bg = "#D9DDDC"
-
+        
         style = ThemedStyle()
         style.theme_use("clam")
+        lbl_bg = "#D9DDDC"
 
         # Welcome label
         self.lbl_username = ttk.Label(self, text=f"Welcome, {self.username}", background=lbl_bg)
@@ -98,25 +100,48 @@ class Core(tk.Toplevel):
         self.create_scrollbar(self.tab2, self.ret_flight_tree)
 
         # Set the padding for button height
-        style.configure("b.TButton", padding=(5, 7), focuscolor=style.configure(".")["background"])
-        style.configure("s.TButton", padding=(7, 12),focuscolor=style.configure(".")["background"])
+        style.configure("b.TButton", padding=(5, 3), focuscolor=style.configure(".")["background"])
+        style.configure("s.TButton", padding=(0, 12),focuscolor=style.configure(".")["background"])
+        style.configure("r.TButton", padding=(0, 5),focuscolor=style.configure(".")["background"])
         style.configure("i.TButton", padding=(0, 0),focuscolor=style.configure(".")["background"])
 
         # Submit button
         self.submit_button = ttk.Button(self, text="Search Now", command=self.submit, style="s.TButton", width=15)
-        self.submit_button.place(x=425, y=85)
+        self.submit_button.place(x=420, y=85)
 
         # Info button
         self.info_button = ttk.Button(self, text="Info", command=self.open_info_window, style="i.TButton", width=8)
-        self.info_button.place(x=650, y=515)
+        self.info_button.place(x=685, y=515)
 
         # Reset button
-        self.reset_button = ttk.Button(self, text="Reset", command=self.reset, style="b.TButton", width=8)
-        self.reset_button.place(x=590, y=10)
+        self.reset_button = ttk.Button(self, text="Reset", command=self.reset, style="r.TButton", width=15)
+        self.reset_button.place(x=420, y=45)
 
         # Exit button
-        self.exit_button = ttk.Button(self, text="Exit", command=self.close_app, style="b.TButton", width=8)
-        self.exit_button.place(x=665, y=10)
+        self.exit_button = ttk.Button(self, text="Exit", command=self.close_app, style="b.TButton", width=5)
+        self.exit_button.place(x=685, y=10)
+
+        # Lookup lable
+        self.lbl_lookup = ttk.Label(self, text="Enter city to look up Airport Code", background=lbl_bg)
+        self.lbl_lookup.place(x=535, y=57)
+        
+        # City label
+        self.lbl_city = ttk.Label(self, text="City:", background=lbl_bg)
+        self.lbl_city.place(x=535, y=85)
+
+        # City entry
+        self.city_var = tk.StringVar()
+        self.entered_city = tk.Entry(self, textvariable=self.city_var)
+        self.entered_city.config(width= 15)
+        self.entered_city.place(x=570, y=85)
+
+        # Lookup button
+        self.lookup_button = ttk.Button(self, text="Lookup", command=self.lookup_airport_code, style="s.TButton", width=8)
+        self.lookup_button.place(x=675, y=85)
+
+        # Airport code label
+        self.lbl_airport_code = ttk.Label(self, text="Airport Code:", background=lbl_bg)
+        self.lbl_airport_code.place(x=535, y=110)
 
     def close_app(self):
         self.destroy()
@@ -185,13 +210,13 @@ class Core(tk.Toplevel):
         treeview.column("Stops", anchor=tk.W, width=80)
         treeview.column("Flight Time", anchor=tk.W, width=80)
 
-        treeview.place(x=10, y=10, width=650, height=270)
+        treeview.place(x=10, y=10, width=660, height=300)
 
         return treeview
     
     def create_scrollbar(self, parent, tree):
         scrollbar = tk.Scrollbar(parent, command=tree.yview)
-        scrollbar.place(x=660, y=12, height=270)
+        scrollbar.place(x=670, y=35, height=275)
         tree.config(yscrollcommand=scrollbar.set)
         return scrollbar
     
