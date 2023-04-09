@@ -2,6 +2,19 @@ import tkinter as tk
 from tkinter import ttk
 from tkcalendar import DateEntry
 from api_call import get_flight_destinations
+import json
+
+def load_demo_result(file_name):
+    with open(file_name, "r") as file:
+        return json.load(file)
+demo = False
+
+
+bg_color = "#F5F5F5"
+fg_color = "#333333"
+button_bg = "#B3B3B3"
+button_hover = "#8ACBF7"
+button_font = ("Arial", 12)
 
 class Core(tk.Toplevel):
     def __init__(self, master=None, username=None, api_key=None):
@@ -9,11 +22,21 @@ class Core(tk.Toplevel):
 
         self.title("Flight Search")
         self.geometry("835x550")
+        self.configure(relief="groove")
         self.username = username
         self.api_key = api_key
+
+        style = ttk.Style()
+        style.theme_use("clam")  # You can also use other themes like 'aqua', 'default', 'alt'
+
         self.create_widgets()
 
+
+
     def create_widgets(self):
+        
+        style = ttk.Style()
+        style.theme_use("clam")  # You can also use other themes like 'aqua', 'default', 'alt'
 
         # Welcome label
         self.lbl_username = tk.Label(self, text=f"Welcome, {self.username}")
@@ -32,7 +55,7 @@ class Core(tk.Toplevel):
         self.pass_var = tk.StringVar(self)
         self.pass_var.set("# of Passengers")
         self.pass_menu = tk.OptionMenu(self, self.pass_var, "1", "2", "3", "4")
-        self.pass_menu.config(width=22)
+        self.pass_menu.config(width=22, bg=button_bg, activebackground=button_hover)
         self.pass_menu.place(x=235, y=45)
 
         # Departure date label and input
@@ -77,19 +100,28 @@ class Core(tk.Toplevel):
         self.ret_flight_tree = self.create_flight_treeview(self.tab2)
         self.create_scrollbar(self.tab2, self.ret_flight_tree)
 
+
+
+
+        # Set the padding for button height
+        style.configure("b.TButton", padding=(5, 7), focuscolor=style.configure(".")["background"])
+        style.configure("s.TButton", padding=(5, 10),focuscolor=style.configure(".")["background"])
+
         # Submit button
-        self.submit_button = tk.Button(self, text="Search Now", command=self.submit)
-        self.submit_button.config(height=2,width=15)
-        self.submit_button.place(x=450, y=65)
+        self.submit_button = ttk.Button(self, text="Search Now", command=self.submit, style="s.TButton", width=15)
+        self.submit_button.place(x=425, y=85)
 
         # Exit button
-        self.exit_button = tk.Button(self, text="Exit", command=self.close_app)
-        self.exit_button.config(height=2,width=8)
+        self.exit_button = ttk.Button(self, text="Exit", command=self.close_app, style="b.TButton", width=8)
         self.exit_button.place(x=745, y=10)
 
-        self.reset_button = tk.Button(self, text="Reset", command=self.reset)
-        self.reset_button.config(height=2, width=8)
+        # Reset button
+        self.reset_button = ttk.Button(self, text="Reset", command=self.reset, style="b.TButton", width=8)
         self.reset_button.place(x=670, y=10)
+
+        # Info button
+        self.info_button = ttk.Button(self, text="Info", command=self.open_info_window, style="b.TButton", width=8)
+        self.info_button.place(x=595, y=10)
 
     def close_app(self):
         self.destroy()
@@ -99,6 +131,32 @@ class Core(tk.Toplevel):
         self.destroy()
         new_app = Core(self.master, self.username, self.api_key)
         self.master.wait_window(new_app)
+
+    def open_info_window(self):
+        info_window = tk.Toplevel(self)
+        info_window.title("Tutorial")
+        info_window.geometry("400x300")
+
+        info_label = tk.Label(info_window, text="How to use the flight search:", font=(16))
+        info_label.pack(pady=10)
+
+        instructions = ("1. Select the airline from the dropdown menu.\n"
+                        "2. Choose the number of passengers.\n"
+                        "3. Enter the departure and return dates.\n"
+                        "4. Input the departure and arrival airport codes.\n"
+                        "5. Click the 'Search Now' button to see the results.\n"
+                        "6. Use the tabs to view departing and return flights.\n"
+                        "7. Click column headers to sort the flight results.\n"
+                        "8. Click 'Reset' to clear the results and start a new search.\n"
+                        "9. Press 'Exit' to close the application.")
+
+        instructions_label = tk.Label(info_window, text=instructions, justify=tk.LEFT, padx=10)
+        instructions_label.pack()
+
+        close_button = tk.Button(info_window, text="Close", command=info_window.destroy)
+        close_button.pack(pady=10)
+
+
     
     def submit(self):
         departure_date = self.start_date.get_date().strftime('%Y-%m-%d')
@@ -109,8 +167,12 @@ class Core(tk.Toplevel):
         carrier = self.carrier_var.get()
 
         try:
-            result = get_flight_destinations(self.api_key, departing_airport, arriving_airport, departure_date, return_date, passengers)
-            self.update_flight_listbox(result, carrier)
+            if demo:
+                result = load_demo_result("demo_results.json")
+                self.update_flight_listbox(result, carrier)
+            else:
+                result = get_flight_destinations(self.api_key, departing_airport, arriving_airport, departure_date, return_date, passengers)
+                self.update_flight_listbox(result, carrier)
         except Exception as e:
             print(e)
 
@@ -138,22 +200,30 @@ class Core(tk.Toplevel):
         tree.config(yscrollcommand=scrollbar.set)
         return scrollbar
     
-    # TODO: Sort by price sorts by alphabetical. Ascending order $1083 < $560 < $690. Need to convert price to not be a string.
     def treeview_sort_column(self, tv, col, reverse):
         l = [(tv.set(k, col), k) for k in tv.get_children('')]
-        l.sort(reverse=reverse)
+        is_numeric = all(val.lstrip("$").replace(".", "", 1).isdigit() for val, k in l)
 
-        for index, (val, k) in enumerate(l):
+        if is_numeric:
+            l.sort(key=lambda t: float(t[0].lstrip("$")), reverse=reverse)
+        else:
+            l.sort(key=lambda t: t[0], reverse=reverse)
+
+        for index, (_, k) in enumerate(l):
             tv.move(k, '', index)
+
+        for item_id in tv.get_children():
+            tv.item(item_id, text='')
 
         tv.heading(col, command=lambda: self.treeview_sort_column(tv, col, not reverse))
 
+
+    # What has this become? Lets refine this a bit or get some good comments going. Maybe split this up?
     def update_flight_listbox(self, flight_data, carrier):
 
         flights = flight_data['data']
 
         for index, flight in enumerate(flights):
-
 
             airline = flight['legs'][0]['carriers'][0]['name']
             if carrier != "Any" and carrier != airline:
@@ -163,31 +233,33 @@ class Core(tk.Toplevel):
             price = flight['price']['amount']
             airline = flight['legs'][0]['carriers'][0]['name']
             stops = flight['legs'][0]['stop_count']
+            flt_time = flight['legs'][0]['duration']
             
             if stops == 1:
                 stoploc = flight['legs'][0]['stops'][0]['alt_id']
-                self.dept_flight_tree.insert("", tk.END, text=f"{index + 1}", values=(airline, departure_time, f"${price}", f"{stops} ({stoploc})"))
+                self.dept_flight_tree.insert("", tk.END, text=f"{index + 1}", values=(airline, departure_time, f"${price}", f"{stops} ({stoploc})", f"{flt_time}"))
             else:
-                self.dept_flight_tree.insert("", tk.END, text=f"{index + 1}", values=(airline, departure_time, f"${price}", f"{stops}"))
+                self.dept_flight_tree.insert("", tk.END, text=f"{index + 1}", values=(airline, departure_time, f"${price}", f"{stops}", f"{flt_time}"))
 
             ret_departure_time = flight['legs'][1]['departure'][11:16]
             ret_airline = flight['legs'][1]['carriers'][0]['name']
             ret_stops = flight['legs'][1]['stop_count']
+            ret_flt_time = flight['legs'][1]['duration']
             
             if ret_stops == 1:
                 ret_stoploc = flight['legs'][1]['stops'][0]['alt_id']
-                self.ret_flight_tree.insert("", tk.END, text=f"{index + 1}", values=(ret_airline, ret_departure_time, f"${price}", f"{ret_stops} ({ret_stoploc})"))
+                self.ret_flight_tree.insert("", tk.END, text=f"{index + 1}", values=(ret_airline, ret_departure_time, f"${price}", f"{ret_stops} ({ret_stoploc})", f"{ret_flt_time}"))
             else:
-                self.ret_flight_tree.insert("", tk.END, text=f"{index + 1}", values=(ret_airline, ret_departure_time, f"${price}", f"{ret_stops}"))
+                self.ret_flight_tree.insert("", tk.END, text=f"{index + 1}", values=(ret_airline, ret_departure_time, f"${price}", f"{ret_stops}", f"{ret_flt_time}"))
 
-
+# For the demo window so I dont have to login
 if __name__ == "__main__":
     root = tk.Tk()
     root.withdraw()
     app = Core(root, username="Demo", api_key="DEMO_API_KEY")
+    demo=True
     root.mainloop()
 
 
-# TODO 2: Make info button
 # TODO 3: Make save template button
 # TODO 4: Stylize GUI if possible? Make an icon / borders / better buttons
