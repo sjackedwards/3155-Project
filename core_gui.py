@@ -95,7 +95,6 @@ class Core(tk.Toplevel):
         self.destroy()
         self.quit()
 
-
     def reset(self):
         self.destroy()
         new_app = Core(self.master, self.username, self.api_key)
@@ -139,6 +138,7 @@ class Core(tk.Toplevel):
         tree.config(yscrollcommand=scrollbar.set)
         return scrollbar
     
+    # TODO: Sort by price sorts by alphabetical. Ascending order $1083 < $560 < $690. Need to convert price to not be a string.
     def treeview_sort_column(self, tv, col, reverse):
         l = [(tv.set(k, col), k) for k in tv.get_children('')]
         l.sort(reverse=reverse)
@@ -147,9 +147,6 @@ class Core(tk.Toplevel):
             tv.move(k, '', index)
 
         tv.heading(col, command=lambda: self.treeview_sort_column(tv, col, not reverse))
-
-
-    # TODO: Carrier filter is now broken since overhaul. 
 
     def update_flight_listbox(self, flight_data, carrier):
 
@@ -189,3 +186,8 @@ if __name__ == "__main__":
     root.withdraw()
     app = Core(root, username="Demo", api_key="DEMO_API_KEY")
     root.mainloop()
+
+
+# TODO 2: Make info button
+# TODO 3: Make save template button
+# TODO 4: Stylize GUI if possible? Make an icon / borders / better buttons
