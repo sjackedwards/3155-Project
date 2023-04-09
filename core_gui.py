@@ -7,7 +7,7 @@ class Core(tk.Toplevel):
         super().__init__(master)
 
         self.title("Flight Searcher")
-        self.geometry("1000x650")
+        self.geometry("850x550")
         self.username = username
         self.api_key = api_key
 
@@ -23,17 +23,25 @@ class Core(tk.Toplevel):
     def create_widgets(self):
         # Welcome label
         self.lbl_username = tk.Label(self, text=f"Welcome, {self.username}")
-        self.lbl_username.place(x=200, y=10)
+        self.lbl_username.place(x=60, y=10)
 
         self.lbl_api_key = tk.Label(self, text=f"API KEY loaded:  {self.api_key}")
-        self.lbl_api_key.place(x=400, y=10)
+        self.lbl_api_key.place(x=240, y=10)
 
         # Carrier dropdown menu
         self.carrier_var = tk.StringVar(self)
-        self.carrier_var.set("Any Airline")
-        self.carrier_menu = tk.OptionMenu(self, self.carrier_var, "Any Airline", "Southwest", "Delta", "United Airlines", "jetBlue", "American Airlines", "Spirit")
+        self.carrier_var.set("Choose Airline")
+        self.carrier_menu = tk.OptionMenu(self, self.carrier_var, "Any", "Southwest", "Delta", "United Airlines", "jetBlue", "American Airlines", "Spirit")
         self.carrier_menu.config(width=22)
         self.carrier_menu.place(x=25, y=45)
+
+
+        # Number of passengers
+        self.carrier_var = tk.StringVar(self)
+        self.carrier_var.set("# of Passengers")
+        self.carrier_menu = tk.OptionMenu(self, self.carrier_var, "1", "2", "3", "4")
+        self.carrier_menu.config(width=22)
+        self.carrier_menu.place(x=235, y=45)
 
         # Departure date label and input
         self.lbl_start_date = tk.Label(self, text="Depart Date:")
@@ -67,29 +75,28 @@ class Core(tk.Toplevel):
         self.entry_arriving_airport.config(width= 10)
         self.entry_arriving_airport.place(x=340, y=110)
 
-        # # Flight listbox with scrollbar
-        # self.flight_listbox = tk.Listbox(self, height=20, width=40)
-        # self.flight_listbox.grid(row=4, column=0, padx=5, pady=5, columnspan=2, sticky='nsew')
-        # self.scrollbar = tk.Scrollbar(self, command=self.flight_listbox.yview)
-        # self.scrollbar.grid(row=4, column=2, sticky='ns', pady=5)
-        # self.flight_listbox.config(yscrollcommand=self.scrollbar.set)
+        # Flight listbox with scrollbar
+        self.flight_listbox = tk.Listbox(self, height=20, width=60)
+        self.flight_listbox.place(x=25, y=200)
+        self.scrollbar = tk.Scrollbar(self,command=self.flight_listbox.yview)
+        self.scrollbar.place(x=390, y=203, height=320)
+        self.flight_listbox.config(yscrollcommand=self.scrollbar.set)
 
-        # # Return flight listbox with scrollbar
-        # self.ret_flight_listbox = tk.Listbox(self, height=20, width=40)
-        # self.ret_flight_listbox.grid(row=4, column=3, padx=5, pady=5, columnspan=2, sticky='nsew')
-        # self.ret_scrollbar = tk.Scrollbar(self, command=self.ret_flight_listbox.yview)
-        # self.ret_scrollbar.grid(row=4, column=5, sticky='ns', pady=5)
-        # self.ret_flight_listbox.config(yscrollcommand=self.ret_scrollbar.set)
+        # Return flight listbox with scrollbar
+        self.ret_flight_listbox = tk.Listbox(self, height=20, width=60)
+        self.ret_flight_listbox.place(x=425, y=200)
+        self.ret_scrollbar = tk.Scrollbar(self, command=self.ret_flight_listbox.yview)
+        self.ret_scrollbar.place(x=790, y=203, height=320)
+        self.ret_flight_listbox.config(yscrollcommand=self.ret_scrollbar.set)
 
-
-
-        # # Submit button
-        # self.submit_button = tk.Button(self, text="Submit", command=self.submit)
-        # self.submit_button.grid(row=5, column=0, padx=5, pady=5)
+        # Submit button
+        self.submit_button = tk.Button(self, text="Search Now", command=self.submit)
+        self.submit_button.config(height=2,width=15)
+        self.submit_button.place(x=450, y=65)
 
         # Exit button
         self.exit_button = tk.Button(self, text="Exit", command=self.close_app)
-        self.exit_button.place(x=250, y=550)
+        self.exit_button.place(x=650, y=10)
 
         
 
