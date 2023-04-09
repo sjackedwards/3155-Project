@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import ttk
 from tkcalendar import DateEntry
 from api_call import get_flight_destinations
 
@@ -6,25 +7,17 @@ class Core(tk.Toplevel):
     def __init__(self, master=None, username=None, api_key=None):
         super().__init__(master)
 
-        self.title("Flight Searcher")
-        self.geometry("850x550")
+        self.title("Flight Search")
+        self.geometry("835x550")
         self.username = username
         self.api_key = api_key
-
         self.create_widgets()
 
-        for i in range(15):
-            self.columnconfigure(i, weight=15)
-
-
-    # TODO 1: Clean literally everything up. Lets make a second listbox for return flights instead of lumping them all into one.
-    # TODO 2: I dont think I would like to book a flight that is leaving 45 mins after mine lands, lets implement a sort by time button.
-    # TODO 3: Change some button names, think of some new buttons we can add, maybe sort buttons. Need to look into tkinter capabilities. 
     def create_widgets(self):
+
         # Welcome label
         self.lbl_username = tk.Label(self, text=f"Welcome, {self.username}")
         self.lbl_username.place(x=60, y=10)
-
         self.lbl_api_key = tk.Label(self, text=f"API KEY loaded:  {self.api_key}")
         self.lbl_api_key.place(x=240, y=10)
 
@@ -35,13 +28,12 @@ class Core(tk.Toplevel):
         self.carrier_menu.config(width=22)
         self.carrier_menu.place(x=25, y=45)
 
-
         # Number of passengers
-        self.carrier_var = tk.StringVar(self)
-        self.carrier_var.set("# of Passengers")
-        self.carrier_menu = tk.OptionMenu(self, self.carrier_var, "1", "2", "3", "4")
-        self.carrier_menu.config(width=22)
-        self.carrier_menu.place(x=235, y=45)
+        self.pass_var = tk.StringVar(self)
+        self.pass_var.set("# of Passengers")
+        self.pass_menu = tk.OptionMenu(self, self.pass_var, "1", "2", "3", "4")
+        self.pass_menu.config(width=22)
+        self.pass_menu.place(x=235, y=45)
 
         # Departure date label and input
         self.lbl_start_date = tk.Label(self, text="Depart Date:")
@@ -49,15 +41,11 @@ class Core(tk.Toplevel):
         self.start_date = DateEntry(self, date_pattern='yyyy-mm-dd')
         self.start_date.place(x=105, y=85)
 
-
         # Return date label and input
         self.lbl_end_date = tk.Label(self, text="Return Date:")
         self.lbl_end_date.place(x=25, y=110)
         self.end_date = DateEntry(self, date_pattern='yyyy-mm-dd')
         self.end_date.place(x=105, y=110)
-
-
-
 
         # Departing airport label and input
         self.lbl_departing_airport = tk.Label(self, text="Departing Airport:")
@@ -75,19 +63,19 @@ class Core(tk.Toplevel):
         self.entry_arriving_airport.config(width= 10)
         self.entry_arriving_airport.place(x=340, y=110)
 
-        # Flight listbox with scrollbar
-        self.flight_listbox = tk.Listbox(self, height=20, width=60)
-        self.flight_listbox.place(x=25, y=200)
-        self.scrollbar = tk.Scrollbar(self,command=self.flight_listbox.yview)
-        self.scrollbar.place(x=390, y=203, height=320)
-        self.flight_listbox.config(yscrollcommand=self.scrollbar.set)
+        # Making tabbable area for TreeView widget
+        self.notebook = ttk.Notebook(self)
+        self.notebook.place(x=25, y=155, width=700, height=350)
+        self.tab1 = ttk.Frame(self.notebook)
+        self.notebook.add(self.tab1, text="Departing Flights")
+        self.tab2 = ttk.Frame(self.notebook)
+        self.notebook.add(self.tab2, text="Return Flights")
 
-        # Return flight listbox with scrollbar
-        self.ret_flight_listbox = tk.Listbox(self, height=20, width=60)
-        self.ret_flight_listbox.place(x=425, y=200)
-        self.ret_scrollbar = tk.Scrollbar(self, command=self.ret_flight_listbox.yview)
-        self.ret_scrollbar.place(x=790, y=203, height=320)
-        self.ret_flight_listbox.config(yscrollcommand=self.ret_scrollbar.set)
+        # Creates TreeView widget inside the tabs
+        self.dept_flight_tree = self.create_flight_treeview(self.tab1)
+        self.create_scrollbar(self.tab1, self.dept_flight_tree)
+        self.ret_flight_tree = self.create_flight_treeview(self.tab2)
+        self.create_scrollbar(self.tab2, self.ret_flight_tree)
 
         # Submit button
         self.submit_button = tk.Button(self, text="Search Now", command=self.submit)
@@ -96,80 +84,94 @@ class Core(tk.Toplevel):
 
         # Exit button
         self.exit_button = tk.Button(self, text="Exit", command=self.close_app)
-        self.exit_button.place(x=650, y=10)
+        self.exit_button.config(height=2,width=8)
+        self.exit_button.place(x=745, y=10)
 
-        
+        self.reset_button = tk.Button(self, text="Reset", command=self.reset)
+        self.reset_button.config(height=2, width=8)
+        self.reset_button.place(x=670, y=10)
 
     def close_app(self):
-        quit()
+        self.destroy()
+        self.quit()
 
-    # TODO : Lets add a dropdown for # of people flying to pass to the api call.
+
+    def reset(self):
+        self.destroy()
+        new_app = Core(self.master, self.username, self.api_key)
+        self.master.wait_window(new_app)
     
     def submit(self):
         departure_date = self.start_date.get_date().strftime('%Y-%m-%d')
         return_date = self.end_date.get_date().strftime('%Y-%m-%d')
         departing_airport = self.departing_airport_var.get()
         arriving_airport = self.arriving_airport_var.get()
-        carrier = self.carrier_var.get()
+        passengers = self.pass_var.get()
 
         try:
-            result = get_flight_destinations(self.api_key, departing_airport, arriving_airport, departure_date, return_date, adults="1")
-            self.update_flight_listbox(result, carrier)
-
+            result = get_flight_destinations(self.api_key, departing_airport, arriving_airport, departure_date, return_date, passengers)
+            self.update_flight_listbox(result)
         except Exception as e:
-            self.flight_listbox.insert(tk.END, f"Error: {e}\n")
+            print(e)
 
-    # TODO 1: I want the list box to clear after every search.
-    # TODO 2: Maybe attempt storing in a database again for better sorting functionality.
-    # TODO 3: Sort buttons???
-    # TODO 4: This looks like crap, but I dont think a method would make it any better. Maybe split this if we make a return flight list box.
-    def update_flight_listbox(self, flight_data, carrier):
+    def create_flight_treeview(self, parent):
+        treeview = ttk.Treeview(parent, columns=("Airline", "Time", "Price", "Stops", "Flight Time"), show="headings", height=10)
+        
+        treeview.heading("Airline", text="Airline", command=lambda: self.treeview_sort_column(treeview, "Airline", False))
+        treeview.heading("Time", text="Depart Time", command=lambda: self.treeview_sort_column(treeview, "Time", False))
+        treeview.heading("Price", text="Price", command=lambda: self.treeview_sort_column(treeview, "Price", False))
+        treeview.heading("Stops", text="Stops", command=lambda: self.treeview_sort_column(treeview, "Stops", False))
+        treeview.heading("Flight Time", text="Flight Time", command=lambda: self.treeview_sort_column(treeview, "Flight Time", False))
+        treeview.column("Airline", anchor=tk.W, width=200)
+        treeview.column("Time", anchor=tk.W, width=100)
+        treeview.column("Price", anchor=tk.W, width=100)
+        treeview.column("Stops", anchor=tk.W, width=80)
+        treeview.column("Flight Time", anchor=tk.W, width=80)
+
+        treeview.place(x=10, y=10, width=650, height=270)
+
+        return treeview
+    
+    def create_scrollbar(self, parent, tree):
+        scrollbar = tk.Scrollbar(parent, command=tree.yview)
+        scrollbar.place(x=660, y=12, height=270)
+        tree.config(yscrollcommand=scrollbar.set)
+        return scrollbar
+    
+    def treeview_sort_column(self, tv, col, reverse):
+        l = [(tv.set(k, col), k) for k in tv.get_children('')]
+        l.sort(reverse=reverse)
+
+        for index, (val, k) in enumerate(l):
+            tv.move(k, '', index)
+
+        tv.heading(col, command=lambda: self.treeview_sort_column(tv, col, not reverse))
+
+    def update_flight_listbox(self, flight_data):
+
         flights = flight_data['data']
+
         for index, flight in enumerate(flights):
             departure_time = flight['legs'][0]['departure'][12:18]
-            origin = flight['legs'][0]['origin']['alt_id']
-            destination = flight['legs'][0]['destination']['alt_id']
             price = flight['price']['amount']
             airline = flight['legs'][0]['carriers'][0]['name']
             stops = flight['legs'][0]['stop_count']
-
-            ret_departure_time = flight['legs'][1]['departure'][12:18]
-            ret_origin = flight['legs'][1]['origin']['alt_id']
-            ret_destination = flight['legs'][1]['destination']['alt_id']
-            ret_price = flight['price']['amount']
-            ret_airline = flight['legs'][1]['carriers'][0]['name']            
             
-            if stops == 0:
-                if carrier == airline:
-                    self.flight_listbox.insert(tk.END, f"Flight {index+1} departure from {origin} to {destination} at {departure_time} with {airline} for ${price}. Non-stop.")
-                    self.flight_listbox.insert(tk.END, f"----Return from {ret_origin} to {ret_destination} at {ret_departure_time} with {ret_airline} for ${ret_price}.")
-                    self.flight_listbox.insert(tk.END, f"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-                else:
-                    if carrier == 'Any Airline':
-                        self.flight_listbox.insert(tk.END, f"Flight {index+1} departure from {origin} to {destination} at {departure_time} with {airline} for ${price}. Non-stop.")
-                        self.flight_listbox.insert(tk.END, f"----Return from {ret_origin} to {ret_destination} at {ret_departure_time} with {ret_airline} for ${ret_price}.")
-                        self.flight_listbox.insert(tk.END, f"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
             if stops == 1:
                 stoploc = flight['legs'][0]['stops'][0]['alt_id']
-                if carrier == airline:
-                    self.flight_listbox.insert(tk.END, f"Flight {index+1} from {origin} to {destination} at {departure_time} with {airline} for ${price}. It has 1 stop in: {stoploc}")
-                    self.flight_listbox.insert(tk.END, f"----Return from {ret_origin} to {ret_destination} at {ret_departure_time} with {ret_airline} for ${ret_price}.")
-                    self.flight_listbox.insert(tk.END, f"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-                else:
-                    if carrier == 'Any Airline':
-                        self.flight_listbox.insert(tk.END, f"Flight {index+1} from {origin} to {destination} at {departure_time} with {airline} for ${price}. It has 1 stop in: {stoploc}")
-                        self.flight_listbox.insert(tk.END, f"----Return from {ret_origin} to {ret_destination} at {ret_departure_time} with {ret_airline} for ${ret_price}.")
-                        self.flight_listbox.insert(tk.END, f"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+                self.dept_flight_tree.insert("", tk.END, text=f"{index + 1}", values=(airline, departure_time, f"${price}", f"{stops} ({stoploc})"))
             else:
-                if carrier == airline:
-                    self.flight_listbox.insert(tk.END, f"Flight {index+1} from {origin} to {destination} at {departure_time} with {airline} for ${price}. It has multiple stops.")
-                    self.flight_listbox.insert(tk.END, f"----Return from {ret_origin} to {ret_destination} at {ret_departure_time} with {ret_airline} for ${ret_price}.")
-                    self.flight_listbox.insert(tk.END, f"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-                else:
-                    if carrier == 'Any Airline':
-                        self.flight_listbox.insert(tk.END, f"Flight {index+1} from {origin} to {destination} at {departure_time} with {airline} for ${price}. It has multiple stops.")
-                        self.flight_listbox.insert(tk.END, f"----Return from {ret_origin} to {ret_destination} at {ret_departure_time} with {ret_airline} for ${ret_price}.")
-                        self.flight_listbox.insert(tk.END, f"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+                self.dept_flight_tree.insert("", tk.END, text=f"{index + 1}", values=(airline, departure_time, f"${price}", f"{stops}"))
+
+            ret_departure_time = flight['legs'][1]['departure'][12:18]
+            ret_airline = flight['legs'][1]['carriers'][0]['name']
+            ret_stops = flight['legs'][1]['stop_count']
+            
+            if ret_stops == 1:
+                ret_stoploc = flight['legs'][1]['stops'][0]['alt_id']
+                self.ret_flight_tree.insert("", tk.END, text=f"{index + 1}", values=(ret_airline, ret_departure_time, f"${price}", f"{ret_stops} ({ret_stoploc})"))
+            else:
+                self.ret_flight_tree.insert("", tk.END, text=f"{index + 1}", values=(ret_airline, ret_departure_time, f"${price}", f"{ret_stops}"))
 
 
 if __name__ == "__main__":
