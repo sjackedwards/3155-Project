@@ -107,10 +107,11 @@ class Core(tk.Toplevel):
         departing_airport = self.departing_airport_var.get()
         arriving_airport = self.arriving_airport_var.get()
         passengers = self.pass_var.get()
+        carrier = self.carrier_var.get()
 
         try:
             result = get_flight_destinations(self.api_key, departing_airport, arriving_airport, departure_date, return_date, passengers)
-            self.update_flight_listbox(result)
+            self.update_flight_listbox(result, carrier)
         except Exception as e:
             print(e)
 
@@ -150,12 +151,18 @@ class Core(tk.Toplevel):
 
     # TODO: Carrier filter is now broken since overhaul. 
 
-    def update_flight_listbox(self, flight_data):
+    def update_flight_listbox(self, flight_data, carrier):
 
         flights = flight_data['data']
 
         for index, flight in enumerate(flights):
-            departure_time = flight['legs'][0]['departure'][12:18]
+
+
+            airline = flight['legs'][0]['carriers'][0]['name']
+            if carrier != "Any" and carrier != airline:
+                continue
+
+            departure_time = flight['legs'][0]['departure'][11:16]
             price = flight['price']['amount']
             airline = flight['legs'][0]['carriers'][0]['name']
             stops = flight['legs'][0]['stop_count']
@@ -166,7 +173,7 @@ class Core(tk.Toplevel):
             else:
                 self.dept_flight_tree.insert("", tk.END, text=f"{index + 1}", values=(airline, departure_time, f"${price}", f"{stops}"))
 
-            ret_departure_time = flight['legs'][1]['departure'][12:18]
+            ret_departure_time = flight['legs'][1]['departure'][11:16]
             ret_airline = flight['legs'][1]['carriers'][0]['name']
             ret_stops = flight['legs'][1]['stop_count']
             
