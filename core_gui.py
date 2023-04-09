@@ -3,6 +3,7 @@ from tkinter import ttk
 from tkcalendar import DateEntry
 from api_call import get_flight_destinations
 import json
+from ttkthemes import ThemedStyle
 
 def load_demo_result(file_name):
     with open(file_name, "r") as file:
@@ -10,68 +11,64 @@ def load_demo_result(file_name):
 demo = False
 
 
-bg_color = "#F5F5F5"
-fg_color = "#333333"
-button_bg = "#B3B3B3"
-button_hover = "#8ACBF7"
-button_font = ("Arial", 12)
+button_bg = "#D9DDDC"
 
 class Core(tk.Toplevel):
     def __init__(self, master=None, username=None, api_key=None):
         super().__init__(master)
 
+        
+
         self.title("Flight Search")
         self.geometry("835x550")
-        self.configure(relief="groove")
+        
+        self.configure(relief="groove", background="#D9DDDC")
         self.username = username
         self.api_key = api_key
-
-        style = ttk.Style()
-        style.theme_use("clam")  # You can also use other themes like 'aqua', 'default', 'alt'
 
         self.create_widgets()
 
 
 
     def create_widgets(self):
-        
-        style = ttk.Style()
-        style.theme_use("clam")  # You can also use other themes like 'aqua', 'default', 'alt'
+        lbl_bg = "#D9DDDC"
+
+        style = ThemedStyle()
+        style.theme_use("clam")
 
         # Welcome label
-        self.lbl_username = tk.Label(self, text=f"Welcome, {self.username}")
-        self.lbl_username.place(x=60, y=10)
-        self.lbl_api_key = tk.Label(self, text=f"API KEY loaded:  {self.api_key}")
-        self.lbl_api_key.place(x=240, y=10)
+        self.lbl_username = ttk.Label(self, text=f"Welcome, {self.username}", background=lbl_bg)
+        self.lbl_username.place(x=25, y=10)
+        self.lbl_api_key = ttk.Label(self, text=f"API KEY loaded:  {self.api_key}", background=lbl_bg)
+        self.lbl_api_key.place(x=25, y=515)
 
         # Carrier dropdown menu
         self.carrier_var = tk.StringVar(self)
-        self.carrier_var.set("Choose Airline")
-        self.carrier_menu = tk.OptionMenu(self, self.carrier_var, "Any", "Southwest", "Delta", "United Airlines", "jetBlue", "American Airlines", "Spirit")
+        #self.carrier_var.set("Choose Airline")
+        self.carrier_menu = ttk.OptionMenu(self, self.carrier_var,"Choose Airline", "Any", "Southwest", "Delta", "United Airlines", "jetBlue", "American Airlines", "Spirit")
         self.carrier_menu.config(width=22)
         self.carrier_menu.place(x=25, y=45)
 
         # Number of passengers
         self.pass_var = tk.StringVar(self)
-        self.pass_var.set("# of Passengers")
-        self.pass_menu = tk.OptionMenu(self, self.pass_var, "1", "2", "3", "4")
+        self.pass_menu = ttk.OptionMenu(self, self.pass_var,"# of Passengers", "1", "2", "3", "4")
         self.pass_menu.config(width=22)
         self.pass_menu.place(x=235, y=45)
 
         # Departure date label and input
-        self.lbl_start_date = tk.Label(self, text="Depart Date:")
+        self.lbl_start_date = ttk.Label(self, text="Depart Date:", background=lbl_bg)
         self.lbl_start_date.place(x=25, y=85)
         self.start_date = DateEntry(self, date_pattern='yyyy-mm-dd')
         self.start_date.place(x=105, y=85)
 
         # Return date label and input
-        self.lbl_end_date = tk.Label(self, text="Return Date:")
+        self.lbl_end_date = ttk.Label(self, text="Return Date:", background=lbl_bg)
         self.lbl_end_date.place(x=25, y=110)
         self.end_date = DateEntry(self, date_pattern='yyyy-mm-dd')
         self.end_date.place(x=105, y=110)
 
         # Departing airport label and input
-        self.lbl_departing_airport = tk.Label(self, text="Departing Airport:")
+        self.lbl_departing_airport = ttk.Label(self, text="Departing Airport:", background=lbl_bg)
         self.lbl_departing_airport.place(x=235, y=85)
         self.departing_airport_var = tk.StringVar()
         self.entry_departing_airport = tk.Entry(self, textvariable=self.departing_airport_var)
@@ -79,7 +76,7 @@ class Core(tk.Toplevel):
         self.entry_departing_airport.place(x=340, y=85)
 
         # Arriving airport label and input
-        self.lbl_arriving_airport = tk.Label(self, text="Arriving Airport:")
+        self.lbl_arriving_airport = ttk.Label(self, text="Arriving Airport:", background=lbl_bg)
         self.lbl_arriving_airport.place(x=235, y=110)
         self.arriving_airport_var = tk.StringVar()
         self.entry_arriving_airport = tk.Entry(self, textvariable=self.arriving_airport_var)
@@ -88,7 +85,7 @@ class Core(tk.Toplevel):
 
         # Making tabbable area for TreeView widget
         self.notebook = ttk.Notebook(self)
-        self.notebook.place(x=25, y=155, width=700, height=350)
+        self.notebook.place(x=25, y=155, width=705, height=350)
         self.tab1 = ttk.Frame(self.notebook)
         self.notebook.add(self.tab1, text="Departing Flights")
         self.tab2 = ttk.Frame(self.notebook)
@@ -100,28 +97,26 @@ class Core(tk.Toplevel):
         self.ret_flight_tree = self.create_flight_treeview(self.tab2)
         self.create_scrollbar(self.tab2, self.ret_flight_tree)
 
-
-
-
         # Set the padding for button height
         style.configure("b.TButton", padding=(5, 7), focuscolor=style.configure(".")["background"])
-        style.configure("s.TButton", padding=(5, 10),focuscolor=style.configure(".")["background"])
+        style.configure("s.TButton", padding=(7, 12),focuscolor=style.configure(".")["background"])
+        style.configure("i.TButton", padding=(0, 0),focuscolor=style.configure(".")["background"])
 
         # Submit button
         self.submit_button = ttk.Button(self, text="Search Now", command=self.submit, style="s.TButton", width=15)
         self.submit_button.place(x=425, y=85)
 
-        # Exit button
-        self.exit_button = ttk.Button(self, text="Exit", command=self.close_app, style="b.TButton", width=8)
-        self.exit_button.place(x=745, y=10)
+        # Info button
+        self.info_button = ttk.Button(self, text="Info", command=self.open_info_window, style="i.TButton", width=8)
+        self.info_button.place(x=650, y=515)
 
         # Reset button
         self.reset_button = ttk.Button(self, text="Reset", command=self.reset, style="b.TButton", width=8)
-        self.reset_button.place(x=670, y=10)
+        self.reset_button.place(x=590, y=10)
 
-        # Info button
-        self.info_button = ttk.Button(self, text="Info", command=self.open_info_window, style="b.TButton", width=8)
-        self.info_button.place(x=595, y=10)
+        # Exit button
+        self.exit_button = ttk.Button(self, text="Exit", command=self.close_app, style="b.TButton", width=8)
+        self.exit_button.place(x=665, y=10)
 
     def close_app(self):
         self.destroy()
