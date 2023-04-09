@@ -1,0 +1,99 @@
+{
+    "data": [
+        {
+            "legs": [
+                {
+                    "carriers": [{"name": "Delta"}],
+                    "departure": "2023-05-01T08:00:00",
+                    "duration":456,
+                    "stop_count": 1,
+                    "stops": [{"alt_id": "LAX"}]
+                },
+                {
+                    "carriers": [{"name": "Delta"}],
+                    "departure": "2023-05-10T19:00:00",
+                    "duration":456,
+                    "stop_count": 0,
+                    "stops": []
+                }
+            ],
+            "price": {"amount": "560"}
+        },
+        {
+            "legs": [
+                {
+                    "carriers": [{"name": "American Airlines"}],
+                    "departure": "2023-05-01T10:00:00",
+                    "duration":456,
+                    "stop_count": 2,
+                    "stops": [{"alt_id": "ATL"}, {"alt_id": "LAX"}]
+                },
+                {
+                    "carriers": [{"name": "American Airlines"}],
+                    "departure": "2023-05-10T17:00:00",
+                    "duration":456,
+                    "stop_count": 0,
+                    "stops": []
+                }
+            ],
+            "price": {"amount": "690"}
+        },
+        {
+            "legs": [
+                {
+                    "carriers": [{"name": "American Airlines"}],
+                    "departure": "2023-05-01T14:00:00",
+                    "duration":456,
+                    "stop_count": 2,
+                    "stops": [{"alt_id": "ATL"}, {"alt_id": "LAX"}]
+                },
+                {
+                    "carriers": [{"name": "American Airlines"}],
+                    "departure": "2023-05-10T12:00:00",
+                    "duration":456,
+                    "stop_count": 0,
+                    "stops": []
+                }
+            ],
+            "price": {"amount": "890"}
+        },
+        {
+            "legs": [
+                {
+                    "carriers": [{"name": "American Airlines"}],
+                    "departure": "2023-05-01T10:12:00",
+                    "duration":456,
+                    "stop_count": 2,
+                    "stops": [{"alt_id": "ATL"}, {"alt_id": "LAX"}]
+                },
+                {
+                    "carriers": [{"name": "American Airlines"}],
+                    "departure": "2023-05-10T17:21:00",
+                    "duration":456,
+                    "stop_count": 0,
+                    "stops": []
+                }
+            ],
+            "price": {"amount": "1500"}
+        },
+        {
+            "legs": [
+                {
+                    "carriers": [{"name": "American Airlines"}],
+                    "departure": "2023-05-01T10:00:00",
+                    "duration":456,
+                    "stop_count": 2,
+                    "stops": [{"alt_id": "ATL"}, {"alt_id": "LAX"}]
+                },
+                {
+                    "carriers": [{"name": "American Airlines"}],
+                    "departure": "2023-05-10T19:31:00",
+                    "duration":456,
+                    "stop_count": 0,
+                    "stops": []
+                }
+            ],
+            "price": {"amount": "19000"}
+        }
+    ]
+}
