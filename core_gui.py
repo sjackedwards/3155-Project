@@ -147,6 +147,9 @@ class Core(tk.Toplevel):
 
         tv.heading(col, command=lambda: self.treeview_sort_column(tv, col, not reverse))
 
+
+    # TODO: Carrier filter is now broken since overhaul. 
+
     def update_flight_listbox(self, flight_data):
 
         flights = flight_data['data']
