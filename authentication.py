@@ -2,12 +2,9 @@ import sqlite3
 import hashlib
 import re
 
-
 # TODO 1: Lets also hash the API key? Unhash on successful login.
-
 def hash_password(password):
     return hashlib.sha256(password.encode('utf-8')).hexdigest()
-
 
 def check_password_requirements(password):
     if len(password) < 8:
@@ -17,9 +14,6 @@ def check_password_requirements(password):
     if not re.search(r'[a-z]', password):
         return False
     return True
-
-
-
 
 def register(username, password, api_key):
     hashed_password = hash_password(password)
@@ -38,10 +32,7 @@ def register(username, password, api_key):
     finally:
         cursor.close()
         db_conn.close()
-
     return success, message
-
-
 
 def login(username, password):
     db_conn = sqlite3.connect("local_app.db")

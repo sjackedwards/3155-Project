@@ -55,7 +55,7 @@ class Core(tk.Toplevel):
         self.pass_var = tk.StringVar(self)
         self.pass_var.set("# of Passengers")
         self.pass_menu = tk.OptionMenu(self, self.pass_var, "1", "2", "3", "4")
-        self.pass_menu.config(width=22, bg=button_bg, activebackground=button_hover)
+        self.pass_menu.config(width=22)
         self.pass_menu.place(x=235, y=45)
 
         # Departure date label and input

@@ -5,7 +5,7 @@ from core_gui import Core
 from database import setup_database
 
 
-
+# TODO: Lets stylize this like the main window.
 class LoginGui(tk.Tk):
     def __init__(self):
         super().__init__()
