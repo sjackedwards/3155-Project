@@ -46,6 +46,11 @@ class LoginGui(tk.Tk):
         self.btn_login = tk.Button(self, text="Login", command=self.login_user)
         self.btn_login.grid(row=2, column=1, padx=5, pady=5)
 
+        self.bind("<Return>", self.login_user_event)
+
+    def login_user_event(self, event):
+        self.login_user()
+
     def register_user(self):
         username = self.ent_username.get()
         password = self.ent_password.get()
