@@ -1,0 +1,7 @@
+@startuml classes
+set namespaceSeparator none
+class "API_call" as api_call.API_call #aliceblue {
+  get_flight_destinations(origin, destination, departure_date, return_date, adults)
+  search_airport()
+}
+@enduml

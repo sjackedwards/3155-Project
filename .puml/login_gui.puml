@@ -1,14 +1,23 @@
 @startuml classes
 set namespaceSeparator none
-class "Application" as gui.Application #aliceblue {
+class "LoginGui" as login_gui.LoginGui #aliceblue {
+  api_key
   btn_login : Button
   btn_register : Button
+  ent_api_key : Entry
+  ent_confirm_password : Entry
   ent_password : Entry
   ent_username : Entry
+  lbl_api_key : Label
+  lbl_confirm_password : Label
   lbl_password : Label
   lbl_username : Label
+  username
+  create_core_window(username, api_key)
   create_widgets()
+  destroy_core_window()
   login_user()
+  login_user_event()
   register_user()
 }
 class "Misc" as tkinter.Misc #grey {
@@ -225,7 +234,7 @@ class "Wm" as tkinter.Wm #grey {
   wm_transient(master)
   wm_withdraw()
 }
-gui.Application --|> tkinter.Tk
+login_gui.LoginGui --|> tkinter.Tk
 tkinter.Tk --|> tkinter.Misc
 tkinter.Tk --|> tkinter.Wm
 @enduml

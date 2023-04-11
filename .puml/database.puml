@@ -1,0 +1,7 @@
+@startuml classes
+set namespaceSeparator none
+class "Database" as database.Database #aliceblue {
+  cleanup_test_user()
+  setup_database()
+}
+@enduml

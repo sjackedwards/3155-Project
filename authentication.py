@@ -2,55 +2,55 @@ import sqlite3
 import hashlib
 import re
 
-# TODO 1: Lets also hash the API key? Unhash on successful login.
-def hash_password(password):
-    return hashlib.sha256(password.encode('utf-8')).hexdigest()
+class Authentication:
 
-def check_password_requirements(password):
-    if len(password) < 8:
-        return False
-    if not re.search(r'[A-Z]', password):
-        return False
-    if not re.search(r'[a-z]', password):
-        return False
-    return True
+    def hash_password(self, password):
+        return hashlib.sha256(password.encode('utf-8')).hexdigest()
 
-def register(username, password, api_key):
-    hashed_password = hash_password(password)
+    def check_password_requirements(self, password):
+        if len(password) < 8:
+            return False
+        if not re.search(r'[A-Z]', password):
+            return False
+        if not re.search(r'[a-z]', password):
+            return False
+        return True
 
-    db_conn = sqlite3.connect("local_app.db")
-    cursor = db_conn.cursor()
+    def register(self, username, password, api_key):
+        hashed_password = self.hash_password(password)
 
-    try:
-        cursor.execute("INSERT INTO users (username, password, api_key) VALUES (?, ?, ?)", (username, hashed_password, api_key))
-        db_conn.commit()
-        success = True
-        message = "User successfully registered."
-    except sqlite3.IntegrityError:
-        success = False
-        message = "Username already exists."
-    finally:
+        db_conn = sqlite3.connect("local_app.db")
+        cursor = db_conn.cursor()
+
+        try:
+            cursor.execute("INSERT INTO users (username, password, api_key) VALUES (?, ?, ?)", (username, hashed_password, api_key))
+            db_conn.commit()
+            success = True
+            message = "User successfully registered."
+        except sqlite3.IntegrityError:
+            success = False
+            message = "Username already exists."
+        finally:
+            cursor.close()
+            db_conn.close()
+        return success, message
+
+    def login(self, username, password):
+        db_conn = sqlite3.connect("local_app.db")
+        cursor = db_conn.cursor()
+
+        cursor.execute("SELECT password, api_key FROM users WHERE username=?", (username,))
+        result = cursor.fetchone()
         cursor.close()
         db_conn.close()
-    return success, message
 
-def login(username, password):
-    db_conn = sqlite3.connect("local_app.db")
-    cursor = db_conn.cursor()
+        if result is None:
+            return None, None
 
-    cursor.execute("SELECT password, api_key FROM users WHERE username=?", (username,))
-    result = cursor.fetchone()
-    cursor.close()
-    db_conn.close()
+        stored_password, api_key = result
+        hashed_password = self.hash_password(password)
 
-    if result is None:
-        return None, None
-
-    stored_password, api_key = result
-    hashed_password = hash_password(password)
-
-    if stored_password == hashed_password:
-        return username, api_key
-    else:
-        return None, None
-
+        if stored_password == hashed_password:
+            return username, api_key
+        else:
+            return None, None

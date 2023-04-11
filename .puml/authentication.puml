@@ -1,0 +1,9 @@
+@startuml classes
+set namespaceSeparator none
+class "Authentication" as authentication.Authentication #aliceblue {
+  check_password_requirements(password)
+  hash_password(password)
+  login(username, password)
+  register(username, password, api_key)
+}
+@enduml

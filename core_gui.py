@@ -6,31 +6,26 @@ import json
 from ttkthemes import ThemedStyle
 from api_call import search_airport
 
+# for testing GUI changes without logging in
 def load_demo_result(file_name):
     with open(file_name, "r") as file:
         return json.load(file)
 demo = False
-
-
-
 
 class Core(tk.Toplevel):
     def __init__(self, master=None, username=None, api_key=None):
         super().__init__(master)
 
         self.title("Flight Search")
-        self.geometry("760x550")
-        
+        self.geometry("760x550")    
         self.configure(relief='groove', background="#D9DDDC")
         self.username = username
         self.api_key = api_key
-
         self.create_widgets()
 
     def lookup_airport_code(self):
         airport_code = search_airport(self.entered_city.get())
-        self.lbl_airport_code["text"] = f"Airport Code: {airport_code}"
-
+        self.lbl_airport_code["text"] = f"Airport Code: {airport_code}"      
 
     def create_widgets(self):
         
@@ -172,12 +167,9 @@ class Core(tk.Toplevel):
 
         instructions_label = tk.Label(info_window, text=instructions, justify=tk.LEFT, padx=10)
         instructions_label.pack()
-
         close_button = tk.Button(info_window, text="Close", command=info_window.destroy)
         close_button.pack(pady=10)
 
-
-    
     def submit(self):
         departure_date = self.start_date.get_date().strftime('%Y-%m-%d')
         return_date = self.end_date.get_date().strftime('%Y-%m-%d')
@@ -237,8 +229,6 @@ class Core(tk.Toplevel):
 
         tv.heading(col, command=lambda: self.treeview_sort_column(tv, col, not reverse))
 
-
-    # What has this become? Lets refine this a bit or get some good comments going. Maybe split this up?
     def update_flight_listbox(self, flight_data, carrier):
 
         flights = flight_data['data']
@@ -249,6 +239,7 @@ class Core(tk.Toplevel):
             if carrier != "Any" and carrier != airline:
                 continue
 
+            # Probably can work this into the API call instead and return a tuple.
             departure_time = flight['legs'][0]['departure'][11:16]
             price = flight['price']['amount']
             airline = flight['legs'][0]['carriers'][0]['name']
@@ -280,6 +271,4 @@ if __name__ == "__main__":
     demo=True
     root.mainloop()
 
-
 # TODO 3: Make save template button
-# TODO 4: Stylize GUI if possible? Make an icon / borders / better buttons
