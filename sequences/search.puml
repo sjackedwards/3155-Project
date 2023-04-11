@@ -1,0 +1,55 @@
+@startuml Search
+
+actor User
+actor Dev_Test
+boundary "FlightSearch" as flightsearch
+control "Search Function" as search_func
+control "Airport Lookup" as airport_lookup
+control "API Call" as api_call
+database "API" as api
+database "Demo Data" as demo_data
+
+User -> flightsearch: Use Flight Search App
+activate flightsearch
+
+flightsearch -> search_func: Enter search parameters
+activate search_func
+
+search_func -> api_call: Search flights
+activate api_call
+
+User -> airport_lookup: Enter city name for airport lookup
+activate airport_lookup
+
+airport_lookup -> api_call: Get airport code
+activate api_call
+
+api_call -> api: Request data from API
+activate api
+
+api --> api_call: Return data from API
+deactivate api
+
+api_call --> search_func: Pass flight results
+deactivate api_call
+
+search_func --> flightsearch: Display flight results
+deactivate search_func
+
+flightsearch -> User: Show flight results or airport code
+deactivate flightsearch
+
+Dev_Test -> flightsearch: Use Flight Search App
+activate flightsearch
+
+flightsearch -> demo_data: Load demo data (if ran as main)
+activate demo_data
+
+demo_data --> flightsearch: Return demo data
+deactivate demo_data
+
+flightsearch -> Dev_Test: Show flight results or airport code
+deactivate flightsearch
+
+
+@enduml

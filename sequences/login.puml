@@ -1,0 +1,27 @@
+@startuml
+actor User
+
+boundary LoginGui
+boundary Authentication
+boundary Core
+boundary Database
+
+User -> LoginGui : Enter username and password
+User -> LoginGui : Click Login button
+LoginGui -> Authentication : login(username, password)
+Authentication -> Database : Verify user credentials
+Database --> Authentication : Return success or failure
+Authentication --> LoginGui : Return token and API key
+LoginGui -> Core : create_core_window(username, api_key)
+User -> Core : Interact with Core GUI
+User -> Core : Close Core GUI
+Core -> LoginGui : destroy_core_window()
+
+User -> LoginGui : Enter registration info
+User -> LoginGui : Click Register button
+LoginGui -> Authentication : register(username, password, api_key)
+Authentication -> Database : Add new user
+Database --> Authentication : Return success or failure
+Authentication --> LoginGui : Return success or error message
+
+@enduml

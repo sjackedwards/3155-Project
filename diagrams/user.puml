@@ -1,0 +1,28 @@
+@startuml flight_search
+left to right direction
+actor User
+rectangle "Flight Search System" as system {
+  (Open Info Window)
+  (Choose Airline)
+  (Choose Number of Passengers)
+  (Enter Departure Date)
+  (Enter Return Date)
+  (Look up Airport Code)
+  (Enter Departing Airport)
+  (Enter Arriving Airport)
+  (Submit)
+  (Reset)
+  (Exit)
+}
+User --> (Open Info Window)
+User --> (Choose Airline)
+User --> (Choose Number of Passengers)
+User --> (Enter Departure Date)
+User --> (Enter Return Date)
+User --> (Look up Airport Code)
+User --> (Enter Departing Airport)
+User --> (Enter Arriving Airport)
+User --> (Submit)
+User --> (Reset)
+User --> (Exit)
+@enduml
