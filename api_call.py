@@ -1,7 +1,6 @@
 import requests
 
 class API_call:
-    # TODO 1: Lets implements # of people flying in adults parameter.
     def get_flight_destinations(api_key, origin, destination, departure_date, return_date, adults):
         
         currency="USD"
