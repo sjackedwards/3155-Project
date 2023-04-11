@@ -1,10 +1,9 @@
+import json
 import tkinter as tk
 from tkinter import ttk
 from tkcalendar import DateEntry
-from api_call import get_flight_destinations
-import json
+from api_call import API_call
 from ttkthemes import ThemedStyle
-from api_call import search_airport
 
 # for testing GUI changes without logging in
 def load_demo_result(file_name):
@@ -24,7 +23,7 @@ class Core(tk.Toplevel):
         self.create_widgets()
 
     def lookup_airport_code(self):
-        airport_code = search_airport(self.entered_city.get())
+        airport_code = API_call.search_airport(self.entered_city.get())
         self.lbl_airport_code["text"] = f"Airport Code: {airport_code}"      
 
     def create_widgets(self):
@@ -183,7 +182,7 @@ class Core(tk.Toplevel):
                 result = load_demo_result("demo_results.json")
                 self.update_flight_listbox(result, carrier)
             else:
-                result = get_flight_destinations(self.api_key, departing_airport, arriving_airport, departure_date, return_date, passengers)
+                result = API_call.get_flight_destinations(self.api_key, departing_airport, arriving_airport, departure_date, return_date, passengers)
                 self.update_flight_listbox(result, carrier)
         except Exception as e:
             print(e)

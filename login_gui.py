@@ -1,8 +1,8 @@
 import tkinter as tk
 from tkinter import messagebox
-from authentication import register, login
+from authentication import Authentication
 from core_gui import Core
-from database import setup_database
+from database import Database
 
 
 # TODO: Lets stylize this like the main window.
@@ -75,7 +75,7 @@ class LoginGui(tk.Tk):
             messagebox.showerror("Error", "Please enter your API Key.")
             return
 
-        success, message = register(username, password, api_key)
+        success, message = Authentication.register(username, password, api_key)
         if success:
             messagebox.showinfo("Registration Success", message)
         else:
@@ -87,7 +87,8 @@ class LoginGui(tk.Tk):
         password = self.ent_password.get()
 
         if username and password:
-            token, api_key = login(username, password)
+            auth = Authentication()
+            token, api_key = auth.login(username, password)
             if token:
                 messagebox.showinfo("Login", "Login successful.")
                 self.api_key = api_key
@@ -114,7 +115,7 @@ class LoginGui(tk.Tk):
 
 
 def main():
-    setup_database()
+    Database.setup_database()
     app = LoginGui()
     app.mainloop()
 
