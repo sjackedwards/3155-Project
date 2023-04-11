@@ -1,5 +1,6 @@
 @startuml
 actor User
+actor "New User"
 
 boundary LoginGui
 boundary Authentication
@@ -14,14 +15,15 @@ Database --> Authentication : Return success or failure
 Authentication --> LoginGui : Return token and API key
 LoginGui -> Core : create_core_window(username, api_key)
 User -> Core : Interact with Core GUI
-User -> Core : Close Core GUI
-Core -> LoginGui : destroy_core_window()
+Core -> LoginGui : Close Login Window
 
-User -> LoginGui : Enter registration info
-User -> LoginGui : Click Register button
+"New User" -> LoginGui : Enter registration info
+"New User" -> LoginGui : Click Register button
 LoginGui -> Authentication : register(username, password, api_key)
 Authentication -> Database : Add new user
 Database --> Authentication : Return success or failure
 Authentication --> LoginGui : Return success or error message
+"New User" -> User : Becomes
 
 @enduml
+
